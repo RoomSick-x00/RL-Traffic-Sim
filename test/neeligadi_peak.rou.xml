@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+
+    <!-- Vehicles departing at 0 seconds -->
+    <trip id="peak_n1" depart="0" from="-E4" to="E5"/>
+    <trip id="peak_s1" depart="0" from="-E5" to="E6"/>
+    <trip id="peak_e1" depart="0" from="-E6" to="E5"/>
+    <trip id="peak_w1" depart="0" from="E3" to="E4"/>
+
+    <!-- Vehicles departing at 3 seconds -->
+    <trip id="peak_n2" depart="3" from="-E4" to="E5"/>
+    <trip id="peak_s2" depart="3" from="-E5" to="E4"/>
+    <trip id="peak_e2" depart="3" from="-E6" to="E5"/>
+    <trip id="peak_w2" depart="3" from="E3" to="E5"/>
+
+    <!-- Vehicles departing at 6 seconds -->
+    <trip id="peak_n3" depart="6" from="-E4" to="E6"/>
+    <trip id="peak_s3" depart="6" from="-E5" to="E6"/>
+    <trip id="peak_e3" depart="6" from="-E6" to="E4"/>
+    <trip id="peak_w3" depart="6" from="E3" to="E4"/>
+
+    <!-- Vehicles departing at 9 seconds -->
+    <trip id="peak_n4" depart="9" from="-E4" to="E5"/>
+    <trip id="peak_s4" depart="9" from="-E5" to="E4"/>
+    <trip id="peak_e4" depart="9" from="-E6" to="E5"/>
+    <trip id="peak_w4" depart="9" from="E3" to="E5"/>
+
+    <!-- Vehicles departing at 12 seconds -->
+    <trip id="peak_n5" depart="12" from="-E4" to="E6"/>
+    <trip id="peak_s5" depart="12" from="-E5" to="E6"/>
+    <trip id="peak_e5" depart="12" from="-E6" to="E4"/>
+    <trip id="peak_w5" depart="12" from="E3" to="E4"/>
+
+</routes>

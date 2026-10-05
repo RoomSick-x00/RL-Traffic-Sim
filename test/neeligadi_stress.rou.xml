@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+
+    <!-- Aggressive single-lane stress test -->
+    <!-- All vehicles enter from North -->
+
+    <trip id="stress2_n1"  depart="0"  from="-E4" to="E5"/>
+    <trip id="stress2_n2"  depart="1"  from="-E4" to="E5"/>
+    <trip id="stress2_n3"  depart="2"  from="-E4" to="E5"/>
+    <trip id="stress2_n4"  depart="3"  from="-E4" to="E5"/>
+    <trip id="stress2_n5"  depart="4"  from="-E4" to="E5"/>
+    <trip id="stress2_n6"  depart="5"  from="-E4" to="E5"/>
+    <trip id="stress2_n7"  depart="6"  from="-E4" to="E5"/>
+    <trip id="stress2_n8"  depart="7"  from="-E4" to="E5"/>
+    <trip id="stress2_n9"  depart="8"  from="-E4" to="E5"/>
+    <trip id="stress2_n10" depart="9"  from="-E4" to="E5"/>
+    <trip id="stress2_n11" depart="10" from="-E4" to="E5"/>
+    <trip id="stress2_n12" depart="11" from="-E4" to="E5"/>
+    <trip id="stress2_n13" depart="12" from="-E4" to="E5"/>
+    <trip id="stress2_n14" depart="13" from="-E4" to="E5"/>
+    <trip id="stress2_n15" depart="14" from="-E4" to="E5"/>
+    <trip id="stress2_n16" depart="15" from="-E4" to="E5"/>
+    <trip id="stress2_n17" depart="16" from="-E4" to="E5"/>
+    <trip id="stress2_n18" depart="17" from="-E4" to="E5"/>
+    <trip id="stress2_n19" depart="18" from="-E4" to="E5"/>
+    <trip id="stress2_n20" depart="19" from="-E4" to="E5"/>
+    <trip id="stress2_n21" depart="20" from="-E4" to="E5"/>
+    <trip id="stress2_n22" depart="21" from="-E4" to="E5"/>
+    <trip id="stress2_n23" depart="22" from="-E4" to="E5"/>
+    <trip id="stress2_n24" depart="23" from="-E4" to="E5"/>
+    <trip id="stress2_n25" depart="24" from="-E4" to="E5"/>
+    <trip id="stress2_n26" depart="25" from="-E4" to="E5"/>
+    <trip id="stress2_n27" depart="26" from="-E4" to="E5"/>
+    <trip id="stress2_n28" depart="27" from="-E4" to="E5"/>
+    <trip id="stress2_n29" depart="28" from="-E4" to="E5"/>
+    <trip id="stress2_n30" depart="29" from="-E4" to="E5"/>
+    <trip id="stress2_n31" depart="30" from="-E4" to="E5"/>
+    <trip id="stress2_n32" depart="31" from="-E4" to="E5"/>
+    <trip id="stress2_n33" depart="32" from="-E4" to="E5"/>
+    <trip id="stress2_n34" depart="33" from="-E4" to="E5"/>
+    <trip id="stress2_n35" depart="34" from="-E4" to="E5"/>
+    <trip id="stress2_n36" depart="35" from="-E4" to="E5"/>
+    <trip id="stress2_n37" depart="36" from="-E4" to="E5"/>
+    <trip id="stress2_n38" depart="37" from="-E4" to="E5"/>
+    <trip id="stress2_n39" depart="38" from="-E4" to="E5"/>
+    <trip id="stress2_n40" depart="39" from="-E4" to="E5"/>
+
+</routes>

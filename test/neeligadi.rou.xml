@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-09-23T14:01:08.482224+05:30 by Eclipse SUMO netedit 1.27.1
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <!-- Vehicles, persons and containers (sorted by depart) -->
+    <trip id="t_0" depart="0.00" from="E3" to="E4"/>
+    <trip id="t_1" depart="0.00" from="-E6" to="E5"/>
+    <trip id="t_10" depart="0.00" color="green" from="-E5" to="E6"/>
+    <trip id="t_11" depart="0.00" color="green" from="-E5" to="E4"/>
+    <trip id="t_12" depart="0.00" color="red" from="-E5" to="E4"/>
+    <trip id="t_2" depart="0.00" from="-E4" to="E5"/>
+    <trip id="t_3" depart="0.00" color="green" from="E3" to="E4"/>
+    <trip id="t_4" depart="0.00" color="red" from="E3" to="E4"/>
+    <trip id="t_5" depart="0.00" color="red" from="-E4" to="E5"/>
+    <trip id="t_6" depart="0.00" color="green" from="-E4" to="E5"/>
+    <trip id="t_7" depart="0.00" color="green" from="-E6" to="E5"/>
+    <trip id="t_8" depart="0.00" color="red" from="-E6" to="E5"/>
+    <trip id="t_9" depart="0.00" color="red" from="-E5" to="E6"/>
+</routes>

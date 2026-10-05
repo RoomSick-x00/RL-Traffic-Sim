@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <input>
+        <net-file value="test.net.xml"/>
+        <route-files value="neeligadi_stress.rou.xml"/>
+    </input>
+
+</sumoConfiguration>

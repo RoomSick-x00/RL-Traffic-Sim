@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+
+    <!-- 7 vehicles every 3 seconds -->
+
+    <trip id="vh_n1" depart="0"  from="-E4" to="E5"/>
+    <trip id="vh_s1" depart="0"  from="-E5" to="E6"/>
+    <trip id="vh_e1" depart="0"  from="-E6" to="E5"/>
+    <trip id="vh_w1" depart="0"  from="E3"  to="E4"/>
+    <trip id="vh_n2" depart="0"  from="-E4" to="E6"/>
+    <trip id="vh_s2" depart="0"  from="-E5" to="E4"/>
+    <trip id="vh_e2" depart="0"  from="-E6" to="E4"/>
+
+    <trip id="vh_w2" depart="3"  from="E3"  to="E5"/>
+    <trip id="vh_n3" depart="3"  from="-E4" to="E5"/>
+    <trip id="vh_s3" depart="3"  from="-E5" to="E6"/>
+    <trip id="vh_e3" depart="3"  from="-E6" to="E5"/>
+    <trip id="vh_w3" depart="3"  from="E3"  to="E4"/>
+    <trip id="vh_n4" depart="3"  from="-E4" to="E6"/>
+    <trip id="vh_s4" depart="3"  from="-E5" to="E4"/>
+
+    <trip id="vh_e4" depart="6"  from="-E6" to="E4"/>
+    <trip id="vh_w4" depart="6"  from="E3"  to="E5"/>
+    <trip id="vh_n5" depart="6"  from="-E4" to="E5"/>
+    <trip id="vh_s5" depart="6"  from="-E5" to="E6"/>
+    <trip id="vh_e5" depart="6"  from="-E6" to="E5"/>
+    <trip id="vh_w5" depart="6"  from="E3"  to="E4"/>
+    <trip id="vh_n6" depart="6"  from="-E4" to="E6"/>
+
+    <trip id="vh_s6" depart="9"  from="-E5" to="E4"/>
+    <trip id="vh_e6" depart="9"  from="-E6" to="E4"/>
+    <trip id="vh_w6" depart="9"  from="E3"  to="E5"/>
+    <trip id="vh_n7" depart="9"  from="-E4" to="E5"/>
+    <trip id="vh_s7" depart="9"  from="-E5" to="E6"/>
+    <trip id="vh_e7" depart="9"  from="-E6" to="E5"/>
+    <trip id="vh_w7" depart="9"  from="E3"  to="E4"/>
+
+    <trip id="vh_n8" depart="12" from="-E4" to="E6"/>
+    <trip id="vh_s8" depart="12" from="-E5" to="E4"/>
+    <trip id="vh_e8" depart="12" from="-E6" to="E4"/>
+    <trip id="vh_w8" depart="12" from="E3"  to="E5"/>
+    <trip id="vh_n9" depart="12" from="-E4" to="E5"/>
+    <trip id="vh_s9" depart="12" from="-E5" to="E6"/>
+    <trip id="vh_e9" depart="12" from="-E6" to="E5"/>
+
+    <trip id="vh_w9" depart="15" from="E3"  to="E4"/>
+    <trip id="vh_n10" depart="15" from="-E4" to="E6"/>
+    <trip id="vh_s10" depart="15" from="-E5" to="E4"/>
+    <trip id="vh_e10" depart="15" from="-E6" to="E4"/>
+    <trip id="vh_w10" depart="15" from="E3"  to="E5"/>
+    <trip id="vh_n11" depart="15" from="-E4" to="E5"/>
+    <trip id="vh_s11" depart="15" from="-E5" to="E6"/>
+
+    <trip id="vh_e11" depart="18" from="-E6" to="E5"/>
+    <trip id="vh_w11" depart="18" from="E3"  to="E4"/>
+    <trip id="vh_n12" depart="18" from="-E4" to="E6"/>
+    <trip id="vh_s12" depart="18" from="-E5" to="E4"/>
+    <trip id="vh_e12" depart="18" from="-E6" to="E4"/>
+    <trip id="vh_w12" depart="18" from="E3"  to="E5"/>
+    <trip id="vh_n13" depart="18" from="-E4" to="E5"/>
+
+</routes>

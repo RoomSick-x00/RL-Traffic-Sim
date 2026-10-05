@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<routes>
+
+    <!-- 5 vehicles at each departure time -->
+
+    <trip id="heavy_n1" depart="0"  from="-E4" to="E5"/>
+    <trip id="heavy_s1" depart="0"  from="-E5" to="E6"/>
+    <trip id="heavy_e1" depart="0"  from="-E6" to="E5"/>
+    <trip id="heavy_w1" depart="0"  from="E3"  to="E4"/>
+    <trip id="heavy_n2" depart="0"  from="-E4" to="E6"/>
+
+    <trip id="heavy_s2" depart="3"  from="-E5" to="E4"/>
+    <trip id="heavy_e2" depart="3"  from="-E6" to="E5"/>
+    <trip id="heavy_w2" depart="3"  from="E3"  to="E5"/>
+    <trip id="heavy_n3" depart="3"  from="-E4" to="E5"/>
+    <trip id="heavy_s3" depart="3"  from="-E5" to="E6"/>
+
+    <trip id="heavy_e3" depart="6"  from="-E6" to="E4"/>
+    <trip id="heavy_w3" depart="6"  from="E3"  to="E4"/>
+    <trip id="heavy_n4" depart="6"  from="-E4" to="E6"/>
+    <trip id="heavy_s4" depart="6"  from="-E5" to="E4"/>
+    <trip id="heavy_e4" depart="6"  from="-E6" to="E5"/>
+
+    <trip id="heavy_w4" depart="9"  from="E3"  to="E5"/>
+    <trip id="heavy_n5" depart="9"  from="-E4" to="E5"/>
+    <trip id="heavy_s5" depart="9"  from="-E5" to="E6"/>
+    <trip id="heavy_e5" depart="9"  from="-E6" to="E4"/>
+    <trip id="heavy_w5" depart="9"  from="E3"  to="E4"/>
+
+    <trip id="heavy_n6" depart="12" from="-E4" to="E6"/>
+    <trip id="heavy_s6" depart="12" from="-E5" to="E4"/>
+    <trip id="heavy_e6" depart="12" from="-E6" to="E5"/>
+    <trip id="heavy_w6" depart="12" from="E3"  to="E5"/>
+    <trip id="heavy_n7" depart="12" from="-E4" to="E5"/>
+
+    <trip id="heavy_s7" depart="15" from="-E5" to="E6"/>
+    <trip id="heavy_e7" depart="15" from="-E6" to="E4"/>
+    <trip id="heavy_w7" depart="15" from="E3"  to="E4"/>
+    <trip id="heavy_n8" depart="15" from="-E4" to="E6"/>
+    <trip id="heavy_s8" depart="15" from="-E5" to="E4"/>
+
+    <trip id="heavy_e8" depart="18" from="-E6" to="E5"/>
+    <trip id="heavy_w8" depart="18" from="E3"  to="E5"/>
+    <trip id="heavy_n9" depart="18" from="-E4" to="E5"/>
+    <trip id="heavy_s9" depart="18" from="-E5" to="E6"/>
+    <trip id="heavy_e9" depart="18" from="-E6" to="E4"/>
+
+</routes>
