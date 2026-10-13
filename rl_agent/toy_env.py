@@ -1,7 +1,13 @@
 import random
 
 class ToyTrafficEnv:
-    def reset(self):
+    def __init__(self):
+        self.rng = random.Random()
+
+    def reset(self, seed=None):
+        if seed is not None:
+            self.rng.seed(seed)
+
         self.queues = {"N":0, "S":0, "E":0, "W":0}  
         self.waiting = {"N":0, "S":0, "E":0, "W":0}
         self.phase = 0
@@ -39,31 +45,31 @@ class ToyTrafficEnv:
 
     def _update_queues(self):
         if self.phase == 0:
-            if random.random() < 0.6:
+            if self.rng.random() < 0.6:
                 self.queues["N"] = max(0, self.queues["N"] - 1)
         else:
-            if random.random() < 0.4:
+            if self.rng.random() < 0.4:
                 self.queues["N"] += 1
 
         if self.phase == 0:
-            if random.random() < 0.6:
+            if self.rng.random() < 0.6:
                 self.queues["S"] = max(0, self.queues["S"] - 1)
         else:
-            if random.random() < 0.4:
+            if self.rng.random() < 0.4:
                 self.queues["S"] += 1
 
         if self.phase == 2:
-            if random.random() < 0.6:
+            if self.rng.random() < 0.6:
                 self.queues["E"] = max(0, self.queues["E"] - 1)
         else:
-            if random.random() < 0.4:
+            if self.rng.random() < 0.4:
                 self.queues["E"] += 1
 
         if self.phase == 2:
-            if random.random() < 0.6:
+            if self.rng.random() < 0.6:
                 self.queues["W"] = max(0, self.queues["W"] - 1)
         else:
-            if random.random() < 0.4:
+            if self.rng.random() < 0.4:
                 self.queues["W"] += 1
 
     def _update_waiting(self):
@@ -85,3 +91,5 @@ if __name__ == "__main__":
         action = random.choices([0, 1], weights=[65, 35], k=1)[0]  # just testing with "keep= 0" "switch = 1" for now
         state, done = env.step(action)
         print(f"Step {i}: state={state}, done={done}")
+        if done:
+            break
