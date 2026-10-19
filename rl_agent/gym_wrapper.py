@@ -17,9 +17,12 @@ class GymnasiumWrapper(gym.Env):
         return processed_state, {}
 
     def step(self, action):
+        old_phase = self.raw_env.phase
         raw_state, done = self.raw_env.step(action)
         processed_state = self._process_state(raw_state)
-        reward = self.reward_fn(raw_state)
+        # A switch request during yellow is ignored by the toy environment.
+        applied_switch = int(action == 1 and old_phase in (0, 2) and raw_state[12] in (1, 3))
+        reward = self.reward_fn(raw_state, applied_switch)
         terminated = False
         truncated = done  # The toy environment ends at its step limit.
         info = {}
