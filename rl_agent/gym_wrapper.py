@@ -7,14 +7,23 @@ class GymnasiumWrapper(gym.Env):
         super().__init__()
         self.raw_env = raw_env
         self.reward_fn = reward_fn
+        self._started = False
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(16,), dtype=np.float32)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
+        if self._started:
+            self.close()
         raw_state = self.raw_env.reset(seed=seed)
+        self._started = True
         processed_state = self._process_state(raw_state)
         return processed_state, {}
+
+    def close(self):
+        if self._started:
+            self.raw_env.close()
+            self._started = False
 
     def step(self, action):
         old_phase = self.raw_env.phase

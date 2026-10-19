@@ -24,12 +24,11 @@ for episode in range(3):
         # Example action
         action = 0
 
-        next_state, reward, done = env.step(action)
+        next_state, done = env.step(action)
 
         print(
             "Step:", step,
             "| Action:", action,
-            "| Reward:", reward,
             "| Phase:", next_state[12]
         )
 

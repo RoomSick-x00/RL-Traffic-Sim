@@ -47,10 +47,13 @@ class TrafficEnvironment:
     # RESET ENVIRONMENT
     # ==================================================
 
-    def reset(self):
+    def reset(self, seed=None):
 
         # Start SUMO
-        traci.start(self.sumo_cmd)
+        sumo_cmd = self.sumo_cmd.copy()
+        if seed is not None:
+            sumo_cmd.extend(["--seed", str(seed)])
+        traci.start(sumo_cmd)
 
         self.step_count = 0
 
@@ -198,20 +201,6 @@ class TrafficEnvironment:
         next_state = self.get_state()
 
         # ----------------------------------------------
-        # REWARD
-        # ----------------------------------------------
-
-        total_queue = (
-            next_state[4]
-            + next_state[5]
-            + next_state[6]
-            + next_state[7]
-        )
-
-        # Negative queue length
-        reward = -total_queue
-
-        # ----------------------------------------------
         # CHECK IF SIMULATION IS FINISHED
         # ----------------------------------------------
 
@@ -219,7 +208,7 @@ class TrafficEnvironment:
             traci.simulation.getMinExpectedNumber() <= 0
         )
 
-        return next_state, reward, done
+        return next_state, done
 
     # ==================================================
     # CLOSE

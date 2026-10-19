@@ -1,5 +1,6 @@
 import random
 import unittest
+from unittest.mock import Mock, call
 
 import numpy as np
 from stable_baselines3.common.monitor import Monitor
@@ -11,6 +12,20 @@ from rl_agent.training import TrainingRewardScale, evaluate_policy, resolve_rewa
 
 
 class TrainingTests(unittest.TestCase):
+    def test_reset_closes_previous_episode_and_close_is_idempotent(self):
+        raw_env = Mock()
+        raw_env.reset.return_value = [0] * 13
+        env = GymnasiumWrapper(raw_env, queue_reward)
+        env.close()
+        env.reset(seed=42)
+        env.reset(seed=43)
+        env.close()
+        env.close()
+        self.assertEqual(raw_env.mock_calls, [
+            call.reset(seed=42), call.close(), call.reset(seed=43), call.close()
+        ])
+        self.assertFalse(env._started)
+
     def test_scaling_preserves_observations_and_raw_episode_logs(self):
         raw_env = GymnasiumWrapper(ToyTrafficEnv(), queue_reward)
         training_env = TrainingRewardScale(

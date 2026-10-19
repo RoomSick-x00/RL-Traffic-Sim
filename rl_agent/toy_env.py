@@ -25,6 +25,9 @@ class ToyTrafficEnv:
         done = self.step_count >= 500
         return state, done
 
+    def close(self):
+        pass  # The toy environment has no external process to shut down.
+
     def get_state(self):
         directions = ("N", "S", "E", "W")
         queue_list = [self.queues[direction] for direction in directions]

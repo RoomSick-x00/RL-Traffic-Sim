@@ -18,12 +18,11 @@ for step in range(20):
     else:
         action = 0
 
-    next_state, reward, done = env.step(action)
+    next_state, done = env.step(action)
 
     print(
         "Step:", step,
         "| Action:", action,
-        "| Reward:", reward,
         "| Phase:", next_state[12],
         "| State:", next_state
     )
