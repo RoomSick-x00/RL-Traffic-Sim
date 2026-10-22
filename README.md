@@ -52,3 +52,29 @@ Run the training integration checks with:
 ```powershell
 python -m unittest rl_agent.test_training -v
 ```
+
+## Measure SUMO episode lengths (Member 1)
+
+On the machine with SUMO installed, ensure `sumo` is on PATH and Python can import
+`traci`. From the project root, run:
+
+```powershell
+python test/measure_episode_lengths.py
+```
+
+This runs normal and peak traffic with seeds 42, 43, and 44, using the network's
+automatic fixed signal cycle (10 seconds green, 3 seconds yellow per direction).
+It closes SUMO between episodes, prints completion lengths, and saves a new
+`logs/episode_lengths_*/results.json`. Send that JSON file back for choosing the
+training episode cap; logs remain Git-ignored.
+
+The default 10,000-step limit is only a measurement safeguard. Runs reaching it
+without finishing are marked truncated and must not be treated as completed runs.
+Step counts exclude the one simulation step inside reset; each measured step is
+one simulated second with the supplied configurations. To change the run settings:
+
+```powershell
+python test/measure_episode_lengths.py --scenarios normal peak --seeds 10 20 30 --max-steps 20000
+```
+
+The loop can be checked without SUMO using `python test/test_episode_lengths.py`.

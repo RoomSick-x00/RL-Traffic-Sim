@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import traci
 
 
@@ -17,7 +19,7 @@ class TrafficEnvironment:
         self.sumo_cmd = [
             "sumo",
             "-c",
-            config_file
+            str(Path(__file__).resolve().parent / config_file)
         ]
 
         # ----------------------------------------------
