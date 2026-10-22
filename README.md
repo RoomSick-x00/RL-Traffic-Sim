@@ -66,6 +66,20 @@ python -m unittest rl_agent.test_training -v
 
 ## Measure SUMO episode lengths (Member 1)
 
+To watch a trained model first, run this from the project root on the SUMO machine:
+
+```powershell
+python -m rl_agent.replay --model logs/YOUR_RUN/best_model.zip --seed 2000 --delay 300
+```
+
+Replace `YOUR_RUN` with the saved run folder. Keep its `config.json` beside the
+model: replay reads the scenario, reward function, and episode cap from it. Use
+the same project/environment version as training. This opens `sumo-gui` and lets
+the saved model control the signals without further training. Increase `--delay`
+to slow the animation (milliseconds per simulation step). The terminal prints
+episode results and waits for Enter before closing the GUI; `--no-wait` skips
+that pause. SUMO and `sumo-gui` must be on PATH, and Python must have `traci`.
+
 On the machine with SUMO installed, ensure `sumo` is on PATH and Python can import
 `traci`. From the project root, run:
 
