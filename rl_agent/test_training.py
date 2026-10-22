@@ -12,6 +12,46 @@ from rl_agent.training import TrainingRewardScale, evaluate_policy, resolve_rewa
 
 
 class TrainingTests(unittest.TestCase):
+    def test_wrapper_truncates_at_150_and_resets_counter(self):
+        raw_env = Mock(spec=["reset", "get_state", "step", "close"])
+        raw_env.reset.return_value = raw_env.get_state.return_value = [0] * 13
+        raw_env.step.return_value = ([0] * 13, False)
+        env = GymnasiumWrapper(raw_env, queue_reward)
+        env.reset(seed=42)
+        for _ in range(149):
+            _, _, terminated, truncated, _ = env.step(0)
+            self.assertFalse(terminated or truncated)
+        _, _, terminated, truncated, _ = env.step(0)
+        self.assertFalse(terminated)
+        self.assertTrue(truncated)
+        self.assertEqual(env._step_count, 150)
+        env.reset(seed=43)
+        self.assertEqual(env._step_count, 0)
+        self.assertFalse(env.step(0)[3])
+        env.close()
+
+    def test_done_is_forwarded_as_termination(self):
+        for done in (False, True):
+            raw_env = Mock()
+            raw_env.reset.return_value = raw_env.get_state.return_value = [0] * 13
+            raw_env.step.return_value = ([0] * 13, done)
+            env = GymnasiumWrapper(raw_env, queue_reward)
+            env.reset()
+            _, _, terminated, truncated, _ = env.step(0)
+            self.assertEqual((terminated, truncated), (done, False))
+            env.close()
+
+    def test_custom_cap_is_honored_instead_of_default_150(self):
+        raw_env = Mock()
+        raw_env.reset.return_value = raw_env.get_state.return_value = [0] * 13
+        raw_env.step.return_value = ([0] * 13, False)
+        env = GymnasiumWrapper(raw_env, queue_reward, max_steps=500)
+        env.reset()
+        for _ in range(499):
+            self.assertFalse(env.step(0)[3])
+        self.assertTrue(env.step(0)[3])
+        env.close()
+
     def test_reset_closes_previous_episode_and_close_is_idempotent(self):
         raw_env = Mock()
         raw_env.reset.return_value = [0] * 13
@@ -27,9 +67,11 @@ class TrainingTests(unittest.TestCase):
         self.assertFalse(env._started)
 
     def test_scaling_preserves_observations_and_raw_episode_logs(self):
-        raw_env = GymnasiumWrapper(ToyTrafficEnv(), queue_reward)
+        raw_env = GymnasiumWrapper(ToyTrafficEnv(), queue_reward,
+                                  max_steps=500)
         training_env = TrainingRewardScale(
-            Monitor(GymnasiumWrapper(ToyTrafficEnv(), queue_reward)), 0.01
+            Monitor(GymnasiumWrapper(ToyTrafficEnv(), queue_reward,
+                                     max_steps=500)), 0.01
         )
         raw_obs, _ = raw_env.reset(seed=42)
         scaled_obs, _ = training_env.reset(seed=42)

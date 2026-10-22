@@ -3,10 +3,14 @@ import numpy as np
 
 
 class GymnasiumWrapper(gym.Env):
-    def __init__(self, raw_env, reward_fn):
+    def __init__(self, raw_env, reward_fn, max_steps=150):
         super().__init__()
+        if not isinstance(max_steps, int) or isinstance(max_steps, bool) or max_steps <= 0:
+            raise ValueError("max_steps must be a positive integer")
         self.raw_env = raw_env
         self.reward_fn = reward_fn
+        self.max_steps = max_steps
+        self._step_count = 0
         self._started = False
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(16,), dtype=np.float32)
@@ -17,6 +21,7 @@ class GymnasiumWrapper(gym.Env):
             self.close()
         raw_state = self.raw_env.reset(seed=seed)
         self._started = True
+        self._step_count = 0
         processed_state = self._process_state(raw_state)
         return processed_state, {}
 
@@ -26,15 +31,16 @@ class GymnasiumWrapper(gym.Env):
             self._started = False
 
     def step(self, action):
-        old_phase = self.raw_env.phase
+        old_phase = self.raw_env.get_state()[12]
         raw_state, done = self.raw_env.step(action)
         processed_state = self._process_state(raw_state)
-        # A switch request during yellow is ignored by the toy environment.
+        # Both environments ignore switch requests during yellow.
         applied_switch = int(action == 1 and old_phase in (0, 2) and raw_state[12] in (1, 3))
         reward = self.reward_fn(raw_state, applied_switch)
-        terminated = False
-        truncated = done  # The toy environment ends at its step limit.
-        info = {}
+        self._step_count += 1
+        terminated = done  # Real env: demand scenario finished.
+        truncated = self._step_count >= self.max_steps  # Safety-net cap.
+        info = {"raw_state": list(raw_state), "applied_switch": applied_switch}
         return processed_state, reward, terminated, truncated, info
 
     def _process_state(self, raw_state):
@@ -60,7 +66,8 @@ if __name__ == "__main__":
     from gymnasium.utils.env_checker import check_env
 
     raw_env = ToyTrafficEnv()
-    wrapped_env = GymnasiumWrapper(raw_env, reward_fn=queue_reward)
+    wrapped_env = GymnasiumWrapper(raw_env, reward_fn=queue_reward,
+                                  max_steps=500)
 
     check_env(wrapped_env)
     print("check_env passed!")

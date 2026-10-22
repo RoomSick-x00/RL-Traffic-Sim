@@ -1,11 +1,19 @@
 from pathlib import Path
+from uuid import uuid4
 
 import traci
 
 
 class TrafficEnvironment:
 
-    def __init__(self, scenario="normal"):
+    def __init__(self, scenario="normal", agent_controlled=False):
+
+        if scenario not in ("normal", "peak"):
+            raise ValueError("scenario must be normal or peak")
+        self.agent_controlled = agent_controlled
+        self.label = f"traffic_{uuid4().hex}"
+        self.connection = None
+        self.arrived = self.departed = self.teleports = 0
 
         # ----------------------------------------------
         # SUMO CONFIGURATION
@@ -51,19 +59,23 @@ class TrafficEnvironment:
 
     def reset(self, seed=None):
 
+        self.close()
         # Start SUMO
         sumo_cmd = self.sumo_cmd.copy()
         if seed is not None:
             sumo_cmd.extend(["--seed", str(seed)])
-        traci.start(sumo_cmd)
-
-        self.step_count = 0
-
-        # Advance simulation
-        traci.simulationStep()
-
-        # Return initial state
-        return self.get_state()
+        traci.start(sumo_cmd, label=self.label, doSwitch=False)
+        self.connection = traci.getConnection(self.label)
+        try:
+            self.step_count = 0
+            self.arrived = self.departed = self.teleports = 0
+            self.sumo_version = self.connection.getVersion()[1]
+            self.connection.simulationStep()
+            self._record_counts()
+            return self.get_state()
+        except BaseException:
+            self.close()
+            raise
 
     # ==================================================
     # GET STATE
@@ -82,7 +94,7 @@ class TrafficEnvironment:
             lane = self.lanes[direction]
 
             vehicle_count = (
-                traci.lane.getLastStepVehicleNumber(lane)
+                self.connection.lane.getLastStepVehicleNumber(lane)
             )
 
             state.append(vehicle_count)
@@ -96,7 +108,7 @@ class TrafficEnvironment:
             lane = self.lanes[direction]
 
             queue = (
-                traci.lane.getLastStepHaltingNumber(lane)
+                self.connection.lane.getLastStepHaltingNumber(lane)
             )
 
             state.append(queue)
@@ -110,7 +122,7 @@ class TrafficEnvironment:
             lane = self.lanes[direction]
 
             waiting_time = (
-                traci.lane.getWaitingTime(lane)
+                self.connection.lane.getWaitingTime(lane)
             )
 
             state.append(waiting_time)
@@ -119,7 +131,7 @@ class TrafficEnvironment:
         # 4. TRAFFIC LIGHT PHASE
         # ----------------------------------------------
 
-        phase = traci.trafficlight.getPhase(
+        phase = self.connection.trafficlight.getPhase(
             self.traffic_light_id
         )
 
@@ -133,7 +145,9 @@ class TrafficEnvironment:
 
     def apply_action(self, action):
 
-        current_phase = traci.trafficlight.getPhase(
+        if action not in (0, 1):
+            raise ValueError("action must be 0 (keep) or 1 (switch)")
+        current_phase = self.connection.trafficlight.getPhase(
             self.traffic_light_id
         )
 
@@ -143,6 +157,10 @@ class TrafficEnvironment:
         # ----------------------------------------------
 
         if action == 0:
+            if self.agent_controlled and current_phase in (0, 2):
+                # Refresh green beyond the next simulation step. Yellow stays automatic.
+                duration = self.connection.simulation.getDeltaT() + 1.0
+                self.connection.trafficlight.setPhaseDuration(self.traffic_light_id, duration)
             return
 
         # ----------------------------------------------
@@ -159,7 +177,7 @@ class TrafficEnvironment:
 
             if current_phase == 0:
 
-                traci.trafficlight.setPhase(
+                self.connection.trafficlight.setPhase(
                     self.traffic_light_id,
                     1
                 )
@@ -171,7 +189,7 @@ class TrafficEnvironment:
 
             elif current_phase == 2:
 
-                traci.trafficlight.setPhase(
+                self.connection.trafficlight.setPhase(
                     self.traffic_light_id,
                     3
                 )
@@ -195,7 +213,8 @@ class TrafficEnvironment:
         self.apply_action(action)
 
         # Advance SUMO
-        traci.simulationStep()
+        self.connection.simulationStep()
+        self._record_counts()
 
         self.step_count += 1
 
@@ -207,7 +226,7 @@ class TrafficEnvironment:
         # ----------------------------------------------
 
         done = (
-            traci.simulation.getMinExpectedNumber() <= 0
+            self.connection.simulation.getMinExpectedNumber() <= 0
         )
 
         return next_state, done
@@ -217,7 +236,26 @@ class TrafficEnvironment:
     # ==================================================
 
     def close(self):
+        if self.connection is not None:
+            self.connection.close()
+            self.connection = None
 
-        traci.close(wait=False)
+    def use_fixed_cycle(self):
+        """Call before reset to leave the network's native signal schedule in charge."""
+        self.agent_controlled = False
 
-        print("Environment closed.")
+    def _record_counts(self):
+        simulation = self.connection.simulation
+        self.arrived += simulation.getArrivedNumber()
+        self.departed += simulation.getDepartedNumber()
+        self.teleports += simulation.getStartingTeleportNumber()
+
+    def get_diagnostics(self):
+        return {
+            "arrived": self.arrived,
+            "departed": self.departed,
+            "teleports": self.teleports,
+            "remaining": self.connection.simulation.getMinExpectedNumber(),
+            "simulation_seconds": self.connection.simulation.getTime(),
+            "sumo_version": self.sumo_version,
+        }

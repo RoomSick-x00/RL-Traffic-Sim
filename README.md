@@ -1,5 +1,16 @@
 # RL-Traffic-Sim
 
+## SUMO integration and reward comparison
+
+The Member 2 pipeline now accepts `--env sumo --scenario normal` (or `peak`) and
+uses a 150-step cap by default. Training and every evaluation use the selected
+factory, cap and reward. Live SUMO verification still needs the SUMO machine.
+
+Start there with `python -m rl_agent.train --env sumo --scenario normal --smoke`.
+Follow [SUMO_HANDOFF.md](SUMO_HANDOFF.md) for the one-seed timing pilot, the matched
+three-reward/three-seed study, resume commands, metrics and the Member 3 ZIP handoff.
+The comparison runner requires matching smoke results before a full SUMO study.
+
 ## Toy DQN training
 
 Run from the project root, using the Python environment with Gymnasium and Stable-Baselines3 installed:
@@ -78,3 +89,12 @@ python test/measure_episode_lengths.py --scenarios normal peak --seeds 10 20 30 
 ```
 
 The loop can be checked without SUMO using `python test/test_episode_lengths.py`.
+
+The Gymnasium wrapper defaults to a 150-step cap (`max_steps=150`), based on the
+reported 50–75-step SUMO fixed-cycle episodes. It counts calls to `step()` after
+each reset. Raw SUMO `done` sets `terminated`; reaching the cap sets `truncated`.
+Both flags can be true if traffic finishes exactly at the cap. Toy training and
+evaluation explicitly retain `max_steps=500`. The wrapper forwards raw `done`
+unchanged as `terminated`; with the toy environment's current 500-step `done`,
+both flags become true at step 500. This simple completion mapping is intended
+for SUMO's demand-finished signal.
