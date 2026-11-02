@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 
 from .junction_diagnostics import JunctionDiagnostics
 from .training import evaluate_policy
-from . import replay
+from . import evaluate_saved, replay
 
 
 class TinySumo:
@@ -50,6 +50,36 @@ class TinySumo:
 
 
 class JunctionDiagnosticTests(unittest.TestCase):
+    def test_saved_model_test_split_uses_frozen_seeds_without_training(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            run = root / "run"
+            run.mkdir()
+            (run / "best_model.zip").write_bytes(b"mock")
+            (run / "config.json").write_text(json.dumps({
+                "environment": {"backend": "sumo", "scenario": "normal"},
+                "reward_function": "combined_reward",
+                "reward_parameters": {"switch_penalty": 0.02},
+                "max_steps": 150, "validation_seeds": [100], "test_seeds": [],
+            }))
+            (run / "validation.json").write_text(json.dumps([
+                {"timesteps": 60000, "mean_reward": -0.2}]))
+            model = Mock()
+            model.predict.return_value = (0, None)
+            with patch.object(evaluate_saved.DQN, "load", return_value=model), \
+                    patch.object(evaluate_saved, "EnvironmentFactory",
+                                 return_value=TinySumo), \
+                    patch.object(evaluate_saved, "TEST_SEEDS", (1000, 1001)):
+                saved = evaluate_saved.evaluate_run(run, root / "out", split="test")
+            result = json.loads(saved.read_text())
+            self.assertEqual(result["evaluation_split"], "test")
+            self.assertEqual(result["evaluation_seeds"], [1000, 1001])
+            self.assertEqual(result["best_test"]["episode_seeds"], [1000, 1001])
+            self.assertEqual(result["fixed_cycle_test"]["episode_seeds"], [1000, 1001])
+            self.assertEqual(result["original_validation_best_step"], 60000)
+            self.assertNotIn("difference_from_original_validation", result)
+            model.learn.assert_not_called()
+
     def test_units_scope_routes_and_zero_time(self):
         raw = TinySumo()
         raw.reset()
