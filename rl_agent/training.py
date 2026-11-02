@@ -20,14 +20,16 @@ from stable_baselines3.common.monitor import Monitor
 
 if __package__:
     from .gym_wrapper import GymnasiumWrapper
-    from .rewards import queue_reward, wait_reward, combined_reward
+    from .rewards import queue_reward, wait_reward, combined_reward, make_combined_reward
     from .toy_env import ToyTrafficEnv
     from .env_factory import EnvironmentFactory
+    from .junction_diagnostics import JunctionDiagnostics
 else:
     from gym_wrapper import GymnasiumWrapper
-    from rewards import queue_reward, wait_reward, combined_reward
+    from rewards import queue_reward, wait_reward, combined_reward, make_combined_reward
     from toy_env import ToyTrafficEnv
     from env_factory import EnvironmentFactory
+    from junction_diagnostics import JunctionDiagnostics
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -76,7 +78,7 @@ def resolve_reward_scale(reward_fn, reward_scale):
         return DEFAULT_REWARD_SCALE
     if reward_fn is wait_reward:
         return DEFAULT_WAIT_REWARD_SCALE
-    if reward_fn is combined_reward:
+    if reward_fn is combined_reward or getattr(reward_fn, "__wrapped__", None) is combined_reward:
         return 1.0  # Waiting is already normalized inside combined_reward.
     raise ValueError("Pass --reward-scale for a custom reward function")
 
@@ -95,7 +97,7 @@ class TrainingRewardScale(gym.RewardWrapper):
 
 
 def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue_reward,
-                    env_factory=ToyTrafficEnv, max_steps=500):
+                    env_factory=ToyTrafficEnv, max_steps=500, junction_diagnostics=False):
     """Use fresh traffic seeds and report rewards in their original units."""
     seeds = tuple(seeds)
     if not seeds:
@@ -112,9 +114,11 @@ def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue
     try:
         for seed in seeds:
             observation, _ = env.reset(seed=seed)
+            junction = JunctionDiagnostics(raw_env) if junction_diagnostics else None
             action_rng = random.Random(seed + 10000)
             episode_return = 0.0
             queue_total = wait_total = switches = 0
+            switch_events = []
             step = 0
             while True:
                 if model is not None:
@@ -126,10 +130,23 @@ def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue
                     action = 0 if native_cycle else int(step % 22 in (10, 21))
                 else:
                     raise ValueError("Provide a model or a recognized baseline")
-                old_phase = raw_env.get_state()[12]
+                old_state = list(raw_env.get_state())
+                old_phase = old_state[12]
                 observation, reward, terminated, truncated, info = env.step(action)
                 state = info["raw_state"]
                 switched = int(old_phase in (0, 2) and state[12] in (1, 3))
+                if switched:
+                    source = (0, 1) if old_phase == 0 else (2, 3)
+                    target = (2, 3) if old_phase == 0 else (0, 1)
+                    source_queue = sum(old_state[4 + i] for i in source)
+                    target_vehicles = sum(old_state[i] for i in target)
+                    switch_events.append({
+                        "step": step + 1, "old_phase": old_phase,
+                        "target_green_phase": 2 if old_phase == 0 else 0,
+                        "source_queue_before": source_queue,
+                        "target_vehicles_before": target_vehicles,
+                        "empty_target_while_queued": bool(target_vehicles == 0 and source_queue > 0),
+                    })
                 if native_cycle:
                     # Charge the same physical switching cost to the automatic baseline.
                     reward = reward_fn(state, switched)
@@ -141,6 +158,8 @@ def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue
                 switches += switched
                 total_steps += 1
                 step += 1
+                if junction is not None:
+                    junction.sample(step, action, old_phase, state[12])
                 if terminated or truncated:
                     break
             returns.append(episode_return)
@@ -150,13 +169,17 @@ def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue
                 "queue_sum_over_steps": queue_total, "wait_sum_over_steps": wait_total,
                 "mean_queue": queue_total / step, "mean_wait": wait_total / step,
                 "switches": switches,
+                "empty_target_switches": sum(e["empty_target_while_queued"] for e in switch_events),
+                "switch_events": switch_events,
             }
             if hasattr(raw_env, "get_diagnostics"):
                 episode.update(raw_env.get_diagnostics())
+            if junction is not None:
+                episode["junction_diagnostics"] = junction.result()
             episodes.append(episode)
     finally:
         env.close()
-    return {
+    result = {
         "mean_reward": float(np.mean(returns)),
         "std_reward": float(np.std(returns)),
         "episode_returns": returns,
@@ -169,7 +192,23 @@ def evaluate_policy(model=None, seeds=TEST_SEEDS, baseline=None, reward_fn=queue
         "mean_queue": float(np.mean([row["mean_queue"] for row in episodes])),
         "mean_wait": float(np.mean([row["mean_wait"] for row in episodes])),
         "mean_switches": float(np.mean([row["switches"] for row in episodes])),
+        "mean_empty_target_switches": float(np.mean([row["empty_target_switches"] for row in episodes])),
+        "empty_target_switch_fraction": (
+            sum(row["empty_target_switches"] for row in episodes) / sum(row["switches"] for row in episodes)
+            if sum(row["switches"] for row in episodes) else None),
+        "switch_metric_definition": (
+            "empty_target_switches counts actual green-to-yellow transitions where the target "
+            "axis has zero incoming-lane vehicles and the source axis has a nonzero queue "
+            "in the pre-step state. This is a proxy, not proof of a wasted switch; "
+            "it does not account for vehicles arriving during yellow."),
     }
+    if junction_diagnostics:
+        result["junction_diagnostics"] = {
+            f"mean_{key}": float(np.mean([row["junction_diagnostics"][key] for row in episodes]))
+            for key in ("incoming_stopped_vehicle_seconds", "internal_stopped_vehicle_seconds",
+                        "total_stopped_vehicle_seconds")
+        }
+    return result
 
 
 class EvaluateAndSave(BaseCallback):
@@ -212,13 +251,20 @@ def train(total_timesteps=150000, reward_scale=None,
           target_update_interval=DEFAULT_TARGET_UPDATE_INTERVAL,
           seed=42, run_dir=None, learning_rate=DEFAULT_LEARNING_RATE, reward_fn=queue_reward,
           env_factory=ToyTrafficEnv, max_steps=500, eval_frequency=10000,
-          validation_seeds=VALIDATION_SEEDS, test_seeds=TEST_SEEDS, run_kind="training"):
+          validation_seeds=VALIDATION_SEEDS, test_seeds=TEST_SEEDS, run_kind="training",
+          switch_penalty=None, validation_only=False):
     """Write each run to its own directory; never overwrite an existing run."""
+    if switch_penalty is not None:
+        if reward_fn is not combined_reward:
+            raise ValueError("switch_penalty requires the combined reward")
+        reward_fn = make_combined_reward(switch_penalty)
     reward_scale = resolve_reward_scale(reward_fn, reward_scale)
     if total_timesteps <= 0 or eval_frequency <= 0:
         raise ValueError("timesteps and evaluation frequency must be positive")
     validation_seeds, test_seeds = tuple(validation_seeds), tuple(test_seeds)
-    if not validation_seeds or not test_seeds:
+    if validation_only:
+        test_seeds = ()
+    if not validation_seeds or (not validation_only and not test_seeds):
         raise ValueError("validation and test seeds cannot be empty")
     if set(validation_seeds) & set(test_seeds):
         raise ValueError("validation and test traffic seeds must be disjoint")
@@ -240,6 +286,9 @@ def train(total_timesteps=150000, reward_scale=None,
         "exploration_fraction": 0.3,
         "exploration_final_eps": 0.05,
         "reward_function": reward_fn.__name__,
+        "reward_parameters": getattr(reward_fn, "reward_parameters",
+                                     {"switch_penalty": 1.0} if reward_fn is combined_reward else {}),
+        "validation_only": validation_only,
         "environment": (env_factory.describe() if hasattr(env_factory, "describe")
                         else {"factory": f"{getattr(env_factory, '__module__', type(env_factory).__module__)}."
                                          f"{getattr(env_factory, '__qualname__', type(env_factory).__qualname__)}"}),
@@ -257,7 +306,8 @@ def train(total_timesteps=150000, reward_scale=None,
     callback = EvaluateAndSave(run_dir, frequency=eval_frequency, reward_fn=reward_fn,
                                env_factory=env_factory, max_steps=max_steps, seeds=validation_seeds)
     eval_options = dict(reward_fn=reward_fn, env_factory=env_factory,
-                        max_steps=max_steps, seeds=test_seeds)
+                        max_steps=max_steps, seeds=validation_seeds if validation_only else test_seeds)
+    split = "validation" if validation_only else "test"
     started = perf_counter()
     try:
         model = DQN(
@@ -276,18 +326,19 @@ def train(total_timesteps=150000, reward_scale=None,
             "config": config,
             "best_validation_mean_reward": callback.best_mean_reward,
             "best_step": callback.best_step,
-            "best_test": evaluate_policy(best_model, **eval_options),
-            "final_test": evaluate_policy(model, **eval_options),
-            "fixed_cycle_test": evaluate_policy(baseline="fixed_cycle", **eval_options),
+            f"best_{split}": evaluate_policy(best_model, **eval_options),
+            f"final_{split}": evaluate_policy(model, **eval_options),
+            f"fixed_cycle_{split}": evaluate_policy(baseline="fixed_cycle", **eval_options),
             "training_seconds_including_validation": learn_seconds,
             "training_steps_per_second": model.num_timesteps / learn_seconds,
             "actual_timesteps": model.num_timesteps,
             "total_seconds": perf_counter() - started,
         }
         (run_dir / "results.json").write_text(json.dumps(results, indent=2))
-        print(f"Completed: best held-out reward={results['best_test']['mean_reward']:.1f}; "
-              f"final={results['final_test']['mean_reward']:.1f}; "
-              f"fixed cycle={results['fixed_cycle_test']['mean_reward']:.1f}", flush=True)
+        label = "validation" if validation_only else "held-out"
+        print(f"Completed: best {label} reward={results[f'best_{split}']['mean_reward']:.3f}; "
+              f"final={results[f'final_{split}']['mean_reward']:.3f}; "
+              f"fixed cycle={results[f'fixed_cycle_{split}']['mean_reward']:.3f}", flush=True)
         return run_dir
     finally:
         env.close()
@@ -301,6 +352,10 @@ def main():
     parser.add_argument("--learning-rate", type=float, default=DEFAULT_LEARNING_RATE)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--reward", choices=("queue", "wait", "combined"), default="queue")
+    parser.add_argument("--switch-penalty", type=float,
+                        help="Combined reward beta (default 1); alpha=1 and wait divisor=500")
+    parser.add_argument("--validation-only", action="store_true",
+                        help="Tune using validation seeds only; skip held-out test evaluation")
     parser.add_argument("--run-dir", type=Path)
     parser.add_argument("--env", choices=("toy", "sumo"), default="toy")
     parser.add_argument("--scenario", choices=("normal", "peak"), default="normal")
@@ -309,6 +364,11 @@ def main():
     parser.add_argument("--smoke", action="store_true",
                         help="check Gymnasium, then run 1000 training steps and two evaluation seeds")
     args = parser.parse_args()
+    if args.switch_penalty is not None:
+        if args.reward != "combined":
+            parser.error("--switch-penalty requires --reward combined")
+        if not np.isfinite(args.switch_penalty) or args.switch_penalty < 0:
+            parser.error("--switch-penalty must be finite and nonnegative")
     options = vars(args)
     backend, scenario = options.pop("env"), options.pop("scenario")
     options["env_factory"] = EnvironmentFactory(backend, scenario)
@@ -317,7 +377,9 @@ def main():
     options["reward_fn"] = REWARDS[options.pop("reward")]
     if options.pop("smoke"):
         from gymnasium.utils.env_checker import check_env
-        checked_env = GymnasiumWrapper(options["env_factory"](), options["reward_fn"],
+        check_reward = (make_combined_reward(options["switch_penalty"])
+                        if options["switch_penalty"] is not None else options["reward_fn"])
+        checked_env = GymnasiumWrapper(options["env_factory"](), check_reward,
                                        max_steps=options["max_steps"])
         try:
             check_env(checked_env, skip_render_check=True)

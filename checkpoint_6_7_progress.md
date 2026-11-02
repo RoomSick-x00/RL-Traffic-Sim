@@ -1,5 +1,11 @@
 # Progress since the Checkpoints 1–5 summary
 
+> **27 October update:** All six remaining wait/combined result and validation
+> pairs have now been verified. All nine normal-scenario runs are complete.
+> See [reward_comparison_normal.md](reward_comparison_normal.md) for the checked
+> results and remaining model-artifact handoff work. The dated record below
+> describes the earlier 23 October status.
+
 **Updated:** 23 October 2026  
 **Owner:** Member 2 — RL agent design, training, and reward comparison  
 **Previous document:** [checkpoint_1_5_summary.md](checkpoint_1_5_summary.md)  
