@@ -1,20 +1,26 @@
 # Member 3 handoff: normal SUMO reward comparison
 
+> Packaging update: all three tuned run folders have been received and audited.
+> A single transfer archive is prepared at
+> `logs/member3_normal_dqn_handoff_20261102.zip` in Member 2's checkout.
+> It contains 12 complete run folders, three tuned held-out JSON results,
+> junction diagnostics, this documentation, and a SHA-256 manifest. Actual
+> delivery to Member 3 has not yet been confirmed.
+
 ## What to collect
 
 | Artifact | Contents | Current location/status |
 |---|---|---|
 | Original nine DQN runs | Queue, pure wait, original combined beta=1; training seeds 42/43/44 | `dqn_all.zip` supplied earlier; older `logs/member3_handoff_20261027_235257.zip` also covers these runs |
-| Tuned combined runs | `combined_beta_0p02_seed42`, `combined_beta_0p02_seed43`, `combined_beta_0p02_seed44` | Ask Member 1 for **all three full folders**; their JSON results alone are insufficient to load the models |
+| Tuned combined runs | `combined_beta_0p02_seed42`, `combined_beta_0p02_seed43`, `combined_beta_0p02_seed44` | Received and included under `runs/tuned/` in the prepared transfer archive |
 | Tuned held-out results | Three JSON files for the saved best models on traffic seeds 1000–1029 | `test_evaluations_dc77ef1e.zip` supplied to Member 2 |
 | Junction validation diagnostics | Four controllers plus fixed cycle, traffic seeds 100–109 | `validation_diagnostics_6b9301d9.zip` supplied to Member 2 |
 | GUI replay trace | Queue model, traffic seed 2000 | `junction_replay_2000_f521a7c1.json` supplied to Member 2 |
 | Comparison and provenance | Tables, formulas, run settings, caveats | `reward_comparison_normal.md`, `checkpoint_1_9_summary.md`, and this file in Git |
 
 The named ZIP/JSON experiment files are outside Git because model and log
-outputs are ignored. Do not expect `git pull` to download them. The Member 3
-delivery is still pending until the tuned model folders and these results are
-actually transferred.
+outputs are ignored. Do not expect `git pull` to download them. The prepared
+transfer archive is also Git-ignored and must be sent directly to Member 3.
 
 ## Run folder contract
 
@@ -24,6 +30,11 @@ Each training folder should contain `best_model.zip`, `final_model.zip`,
 `--validation-only`; their `results.json` contains `best_validation` and
 `final_validation`, while the separate `test_evaluations_dc77ef1e.zip` supplies
 `best_test`. Use the validation-selected `best_model.zip` for comparisons.
+All three tuned best models load locally on CPU with 16-value observations and
+two actions. Their selected timesteps match `results.json` and validation
+history, their source snapshots match recorded hashes, and their model SHA-256
+hashes match the held-out evaluation JSONs. The final transfer archive passed
+ZIP integrity and manifest-hash checks.
 
 All models use 13 raw state values, 16 normalized observations, and two actions:
 0 keeps the phase, 1 requests a switch through yellow. The frozen normal study

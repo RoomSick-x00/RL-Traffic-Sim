@@ -125,10 +125,10 @@ its declared optimizer multiplier (queue 0.01, wait 0.00025, combined 1.0).
 1. The tuned combined test-only evaluation and GUI replay were run on Member 1's
    SUMO machine. Preserve the three tuned run folders so Member 3 can reproduce
    those results using their saved environment, code, and dependency settings.
-2. The prepared handoff ZIP under `logs/member3_handoff_20261027_235257.zip`
-   contains the original nine runs. Add the three tuned combined run folders
-   and their held-out evaluation JSONs to the final Member 3 handoff. Logs and
-   model artifacts remain Git-ignored.
+2. The prepared `logs/member3_normal_dqn_handoff_20261102.zip` contains all
+   12 run folders, tuned held-out evaluation JSONs, junction diagnostics,
+   documentation, and a SHA-256 manifest. Logs and model artifacts remain
+   Git-ignored; send this archive directly to Member 3.
 3. Provide this comparison and the artifacts to Member 3 for plots, report, and
    further evaluation. Checkpoint 9 remains pending actual delivery.
 4. Optional PPO and additional peak-demand training remain separate scope decisions.

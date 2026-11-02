@@ -14,7 +14,7 @@ comparison. Historical details are in `checkpoint_1_5_summary.md` and
 | 6 | Real SUMO swap | Complete for normal traffic | The factory selects Member 1's TraCI environment. Live smoke, full training/evaluation, GUI replay, and junction diagnostics ran on the SUMO machine. |
 | 7 | Reward variants trained | Complete for normal traffic | Queue, wait, original combined, and validation-tuned combined beta=0.02 each have three 150,000-step training runs and saved validation-selected models. The tuned combined models also have held-out results. |
 | 8 | PPO | Optional, not run | The required comparison uses DQN. |
-| 9 | Handoff to Member 3 | Pending delivery | The report and test JSONs are ready. Collect the three tuned model folders from Member 1, then transfer all models, logs, and results to Member 3. |
+| 9 | Handoff to Member 3 | Packaged; pending delivery | All 12 run folders, evaluations, and reports are in `logs/member3_normal_dqn_handoff_20261102.zip`. Transfer it to Member 3 and confirm receipt. |
 
 The same normal scenario and 30 held-out traffic seeds 1000–1029 were used
 for the reported comparison. On those seeds, pure wait averaged 1.980 lane

@@ -11,7 +11,7 @@ by this file and `checkpoint_1_9_summary.md`.
 | 6 — real SUMO swap | Complete for normal scenario | Live smoke run, normal-scenario training, GUI replay, and junction diagnostics succeeded on Member 1's SUMO machine. The real environment uses the same 13-value raw state and 2-action wrapper. |
 | 7 — reward variants | Complete for normal scenario | Queue, pure wait, and original combined each trained at 150,000 steps on seeds 42/43/44. Tuned combined beta=0.02 was also trained on all three seeds. Validation selected the best checkpoint within each run. |
 | 8 — PPO | Optional, not run | DQN supplies the required reward-function comparison. |
-| 9 — Member 3 handoff | Pending delivery | Results and documentation are ready; the three tuned combined run folders with model weights still need to be collected from Member 1 and transferred with the existing nine-run archive. |
+| 9 — Member 3 handoff | Packaged; pending delivery | The three tuned run folders were received and audited. A single archive containing all 12 runs, evaluations, and reports is ready at `logs/member3_normal_dqn_handoff_20261102.zip`; Member 3 receipt remains unconfirmed. |
 
 ## Fixed experimental setup
 
@@ -59,7 +59,7 @@ that this priority rule is intended; no network edit or retraining followed.
 - `JUNCTION_DIAGNOSTIC_CHECKS.md` defines the inside-junction measurement.
 - `FINAL_HELDOUT_EVALUATION.md` records the test-only command.
 - The supplied `test_evaluations_dc77ef1e.zip` holds the three tuned held-out JSON results. The original nine models are in `dqn_all.zip` and the earlier handoff archive. These archives are external artifacts, not Git files.
-- `MEMBER3_HANDOFF.md` identifies the exact files to transfer and the limits to report.
+- `MEMBER3_HANDOFF.md` identifies the final transfer archive and the limits to report.
 
-Checkpoint 9 closes only when Member 3 receives the model folders, results,
-and report. Peak-demand training and PPO remain optional future experiments.
+Checkpoint 9 closes only when Member 3 receives the transfer archive. Peak-demand
+training and PPO remain optional future experiments.

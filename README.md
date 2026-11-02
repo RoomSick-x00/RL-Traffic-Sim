@@ -6,6 +6,8 @@ reward study is complete; the Member 3 artifact transfer is pending. See
 [`checkpoint_1_9_summary.md`](checkpoint_1_9_summary.md) for checkpoint status,
 [`reward_comparison_normal.md`](reward_comparison_normal.md) for results, and
 [`MEMBER3_HANDOFF.md`](MEMBER3_HANDOFF.md) for the files Member 3 needs.
+The complete 12-run transfer archive is prepared under Git-ignored
+`logs/member3_normal_dqn_handoff_20261102.zip` and must be sent directly.
 
 ## Environment and agent
 
