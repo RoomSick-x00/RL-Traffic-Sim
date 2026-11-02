@@ -1,5 +1,9 @@
 # Progress since the Checkpoints 1–5 summary
 
+> Historical progress record. For the final normal-scenario results and current
+> checkpoint status, see [checkpoint_1_9_summary.md](checkpoint_1_9_summary.md)
+> and [reward_comparison_normal.md](reward_comparison_normal.md).
+
 > **27 October update:** All six remaining wait/combined result and validation
 > pairs have now been verified. All nine normal-scenario runs are complete.
 > See [reward_comparison_normal.md](reward_comparison_normal.md) for the checked

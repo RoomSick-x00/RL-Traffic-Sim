@@ -1,15 +1,21 @@
 # Member 2: SUMO reward comparison and handoff
 
+> Historical run guide. Live SUMO smoke, the normal-scenario DQN reward study,
+> and tuned combined beta=0.02 held-out evaluation have completed. Use
+> [checkpoint_1_9_summary.md](checkpoint_1_9_summary.md) for current checkpoint
+> status and [MEMBER3_HANDOFF.md](MEMBER3_HANDOFF.md) for the final artifact list.
+
 ## Checkpoint status
 
 - 1–5: toy design, wrapper, and initial DQN validation completed previously.
-- 6: integration code prepared; **open until a live SUMO smoke run succeeds**.
-- 7: **open** until queue, wait, and combined rewards have three completed training runs each.
+- 6: completed by live SUMO smoke, full training, and GUI replay.
+- 7: completed for normal traffic with three DQN training seeds per reward;
+  tuned combined beta=0.02 also has three training runs and held-out results.
 - 8: optional PPO deferred; finish the DQN reward comparison first.
-- 9: packaging automated; **open** until Member 3 receives the real trained artifacts.
+- 9: **pending delivery** of the trained artifacts to Member 3.
 
-An earlier Git commit called “Checkpoint 7” was a code snapshot, not evidence that
-the three real reward experiments had been completed.
+The original comparison ZIP covers nine runs. The later three tuned combined
+run folders must be transferred separately or added to the final handoff.
 
 ## Run on the machine with SUMO
 

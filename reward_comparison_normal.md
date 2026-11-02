@@ -1,5 +1,9 @@
 # Normal SUMO scenario: completed DQN reward comparison
 
+> Final update: tuned combined beta=0.02 has three validation-selected models
+> and held-out results. See [MEMBER3_HANDOFF.md](MEMBER3_HANDOFF.md) for the
+> remaining artifact transfer.
+
 Verified 27 October 2026. This updates the experiment status in
 [checkpoint_6_7_progress.md](checkpoint_6_7_progress.md).
 
@@ -118,10 +122,9 @@ its declared optimizer multiplier (queue 0.01, wait 0.00025, combined 1.0).
 
 ## Remaining handoff work
 
-1. Run live SUMO evaluation reproduction using the received models and their saved
-   environment, code, and dependency settings. Local model loading checks have
-   passed; the local NumPy version differs from the recorded training version.
-   Confirm GUI replay separately if it has not already been demonstrated.
+1. The tuned combined test-only evaluation and GUI replay were run on Member 1's
+   SUMO machine. Preserve the three tuned run folders so Member 3 can reproduce
+   those results using their saved environment, code, and dependency settings.
 2. The prepared handoff ZIP under `logs/member3_handoff_20261027_235257.zip`
    contains the original nine runs. Add the three tuned combined run folders
    and their held-out evaluation JSONs to the final Member 3 handoff. Logs and

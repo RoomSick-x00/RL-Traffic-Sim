@@ -1,5 +1,10 @@
 # Final held-out evaluation: combined beta=0.02
 
+> Completed on Member 1's SUMO machine. The three output JSONs were supplied in
+> `test_evaluations_dc77ef1e.zip` and summarized in
+> [reward_comparison_normal.md](reward_comparison_normal.md). The command below
+> is retained for reproduction.
+
 The combined beta=0.02 configuration is frozen after validation on traffic
 seeds 100–109 and training seeds 42, 43, and 44. The three best models were
 chosen using validation reward. Do not retrain or tune beta using the test

@@ -1,5 +1,10 @@
 # Combined reward: validation-only beta experiment
 
+> Status update: beta=0.02 runs for seeds 43 and 44 completed, and all three
+> beta=0.02 best models were evaluated on held-out traffic seeds 1000–1029.
+> See [reward_comparison_normal.md](reward_comparison_normal.md) for final
+> traffic metrics. The commands below document the completed workflow.
+
 ## Follow-up order agreed on 28 October
 
 ### 1. Fill the shared validation table before any new training

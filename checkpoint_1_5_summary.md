@@ -1,4 +1,8 @@
 # RL Traffic Signal Project — Checkpoints 1–5 Summary
+> Historical toy-stage record. For the current raw environment interface,
+> completed SUMO study, corrected reward scaling, and checkpoint status, see
+> [checkpoint_1_9_summary.md](checkpoint_1_9_summary.md) and
+> [checkpoint_5_9_summary.md](checkpoint_5_9_summary.md).
 **Member 2 (RL Agent Design & Training) — handoff notes for Member 3**
 
 ---
